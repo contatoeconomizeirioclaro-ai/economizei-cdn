@@ -139,7 +139,8 @@
   }
   function acharEspecial(q, nome, campos) {
     return carregarEspecial(nome).then(function (rows) {
-      var toks = tokens(q), base = rows;
+      var toks = tokens(q), base = rows, genericos = nome === 'onibus' ? ['onibus','linha','linhas','horario','horarios','passagem','tarifa','itinerario'] : nome === 'eventos' ? ['evento','eventos','show','shows','festa','festas','agenda'] : ['vaga','vagas','emprego','empregos','trabalho','estagio','estagio'];
+      toks = toks.filter(function (t) { return genericos.indexOf(t) < 0; });
       if (nome === 'eventos' && /\bhoje\b/.test(norm(q))) base = base.filter(function (o) { return eventoHoje(o.data); });
       return base.filter(function (o) { var s = campos.map(function (k) { return o[k] || ''; }).join(' '); return toks.some(function (t) { return temPalavra(norm(s), t); }); }).slice(0, 8);
     });
@@ -147,15 +148,22 @@
   function ehEvento(q) { return /\b(evento|eventos|show|shows|festa|festas|feira|exposicao|exposição|agenda|rolando|acontece)\b/.test(q); }
   function ehVaga(q) { return /\b(vaga|vagas|emprego|empregos|trabalho|estagio|estágio|contratando|oportunidade)\b/.test(q); }
   function ehOnibus(q) { return /\b(onibus|ônibus|linha|linhas|passagem|tarifa|itinerario|itinerário)\b/.test(q); }
+  function ehVitrine(q) { return /\b(livro|livros|autor|autora|autores|vitrine do escritor|escritor)\b/.test(q); }
+  function responderVitrine(q) {
+    if (!ehVitrine(q)) return null;
+    var n = norm(q);
+    if (/\b(livro|livros|autor|autora|autores|vitrine|escritor)\b/.test(n)) { ULTIMO_GUIA = 'Eu quis dizer que ainda não localizei esse título ou autor na Vitrine. Posso te mostrar a Vitrine, ajudar a encontrar outros autores ou orientar o autor sobre como solicitar a inclusão.'; return ok([{ t: 'Ainda não localizei esse título ou autor na Vitrine do Escritor.' }, { t: 'Mas posso te ajudar a continuar: você pode conhecer os autores e livros disponíveis, ou avisar o autor para solicitar a inclusão da obra.' }, { l: [['Abrir a Vitrine do Escritor', R.base + '/p/vitrine-do-escritor.html'], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }]); }
+    return null;
+  }
   function responderEspecial(q) {
     var nome, campos, titulo, vazio;
-    if (ehEvento(q)) { nome = 'eventos'; campos = ['titulo','local','descricao','categoria']; titulo = 'eventos'; vazio = 'Não encontrei esse evento por enquanto. Posso abrir a agenda para você dar uma olhada.'; }
-    else if (ehVaga(q)) { nome = 'vagas'; campos = ['empresa','cargo','descricao','local','tipo','requisitos']; titulo = 'vagas'; vazio = 'Não encontrei uma vaga com esse perfil agora. Posso abrir a página de oportunidades para você conferir.'; }
-    else if (ehOnibus(q)) { nome = 'onibus'; campos = ['empresa','itinerario','tipo']; titulo = 'linhas de ônibus'; vazio = 'Não localizei essa linha ainda. Posso abrir os horários de ônibus para você conferir.'; }
+    if (ehEvento(q)) { nome = 'eventos'; campos = ['titulo','local','descricao','categoria']; titulo = 'eventos'; vazio = 'Ainda não localizei esse evento na agenda.'; }
+    else if (ehVaga(q)) { nome = 'vagas'; campos = ['empresa','cargo','descricao','local','tipo','requisitos']; titulo = 'vagas'; vazio = 'Ainda não localizei uma vaga com esse perfil.'; }
+    else if (ehOnibus(q)) { nome = 'onibus'; campos = ['empresa','itinerario','tipo']; titulo = 'linhas de ônibus'; vazio = 'Ainda não localizei essa linha nos horários disponíveis.'; }
     else return null;
     return acharEspecial(q, nome, campos).then(function (rows) {
       var cfg = R.especiais[nome], b = [];
-      if (!rows.length) return { blocos: [{ t: vazio + ' Posso abrir a página para você conferir os filtros. Se perceber que algo precisa ser atualizado, fale com a equipe por aqui.' }, { l: [['Abrir ' + titulo, R.base + cfg.pagina], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }], achou: false };
+      if (!rows.length) { ULTIMO_GUIA = 'Eu não consegui localizar esse item agora, mas ainda posso abrir a página correspondente ou ajudar a avisar a equipe.'; return { blocos: [{ t: vazio + ' Posso abrir a página para você conferir os filtros. Se perceber que algo precisa ser atualizado, fale com a equipe por aqui.' }, { l: [['Abrir ' + titulo, R.base + cfg.pagina], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }], achou: false }; }
       b.push({ t: 'Encontrei ' + rows.length + (rows.length === 1 ? ' resultado:' : ' resultados:') });
       b.push({ l: rows.map(function (o) {
         var label = nome === 'eventos' ? (o.titulo || 'Evento') + (o.data ? ' · ' + o.data : '') : nome === 'vagas' ? (o.cargo || 'Vaga') + (o.empresa ? ' · ' + o.empresa : '') : (o.itinerario || 'Linha') + (o.empresa ? ' · ' + o.empresa : '');
@@ -297,7 +305,7 @@
 
   /* ---------- contexto da conversa ---------- */
   var CTX = { termo: '', planilha: null, lista: null, item: null, ts: 0, vazias: 0 };
-  var ULTIMA_ACAO = null;
+  var ULTIMA_ACAO = null, ULTIMO_GUIA = null;
   function ctxAtivo() { return CTX.termo && (Date.now() - CTX.ts < 300000) && CTX.vazias < 3; }
   function ctxReset() { CTX = { termo: '', planilha: null, lista: null, item: null, ts: 0, vazias: 0 }; ULTIMA_ACAO = null; }
   function ctxSet(termo, lista, item) { CTX = { termo: termo || 'x', planilha: (item && item.pl) || (lista && lista[0] && lista[0].pl) || CTX.planilha, lista: lista || null, item: item || null, ts: Date.now(), vazias: 0 }; }
@@ -334,12 +342,13 @@
     if (/onibus|horario-de-onibus/.test(p)) return 'onibus';
     if (/trilhas/.test(p)) return 'trilhas';
     if (/festas-e-eventos/.test(p)) return 'festas';
-    if (/onde-comer|mercados|casa-e-decoracao|construcao|servicos-profissionais|saude|beleza|automotivo|transporte|educacao|residenciais|solucoes|turismo|pets|campo-e-grandes|moda|destaques/.test(p)) return 'grupo';
+    if (/turismo-e-hospedagem/.test(p)) return 'turismo';
+    if (/onde-comer|mercados|casa-e-decoracao|construcao|servicos-profissionais|saude|beleza|automotivo|transporte|educacao|residenciais|solucoes|pets|campo-e-grandes|moda|destaques/.test(p)) return 'grupo';
     return 'default';
   }
   function saudacao() { var h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
   function atalhos() { return R.atalhos.map(function (a) { return [a[0], R.base + a[1]]; }); }
-  function ehPedidoCategorias(q) { return /\b(categoria|categorias|tipos|opcoes|opções)\b/.test(q); }
+  function ehPedidoCategorias(q) { return /\b(categoria|categorias|tipos|opcoes|opções)\b/.test(q) || /^(e\s+)?(almoçar|almoco|almocar|lanchar|comer|tomar cafe|tomar café)\b/.test(q); }
   function categoriasDisponiveis(q) {
     var n = norm(q), escolhidas = [];
     if (/\b(almoco|almocar|refeicao|comida|comer)\b/.test(n)) escolhidas = CATS.filter(function (c) { return c.gid === 'onde-comer' && c.filtro === 'restaurantes-e-marmitarias'; });
@@ -355,12 +364,27 @@
     return { blocos: [{ t: r.titulo }, { l: r.grupos.map(function (g) { return [g.nome, urlGrupo(g)]; }) }], achou: true };
   }
   function ehEsclarecimento(q) { return /^(como assim|o que quer dizer|nao entendi|não entendi|explica|explique)\b/.test(q); }
+  function ehPagina(q) { return /\b(como funciona|onde estou|em que pagina|qual pagina|o que tem nesta pagina|o que tem nessa pagina)\b/.test(q); }
+  function ehSaudacao(q) { return /^(oi|ola|olá|bom dia|boa tarde|boa noite|e ai|e aí|tudo bem)\b/.test(q); }
+  function ehPedidoAmplo(q) { return /\b(quero um lugar|preciso de um lugar|me ajuda|pode me ajudar|estou procurando algo|quero encontrar algo)\b/.test(q); }
+  function respostaPagina(q) {
+    if (!ehPagina(q)) return null;
+    var tipo = tipoPagina(), b;
+    if (tipo === 'turismo') b = [{ t: 'Você está na área de Turismo e Hospedagem. Aqui dá para descobrir onde ficar, encontrar guias e conhecer passeios e experiências de Rio Claro.' }, { t: 'Se você estiver planejando uma visita, posso te ajudar a procurar hospedagem, guias, excursões e lugares para comer.' }, { l: [['Ver Turismo e Hospedagem', R.base + '/p/turismo-e-hospedagem.html'], ['Onde Comer', R.base + '/p/onde-comer_13.html']] }];
+    else if (tipo === 'grupo') b = [{ t: 'Você está em uma página de serviços e lugares de Rio Claro. Aqui eu posso te ajudar a encontrar opções, consultar detalhes e procurar alternativas próximas.' }, { l: atalhos() }];
+    else if (tipo === 'vagas') b = [{ t: 'Você está na área de Empregos e Estágios. Aqui você pode procurar oportunidades e conferir os detalhes das vagas.' }, { l: [['Abrir Empregos e Estágios', R.base + '/p/empregos-e-estagios.html'], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }];
+    else if (tipo === 'onibus') b = [{ t: 'Você está na área de Horários de Ônibus. Posso ajudar a procurar uma linha ou mostrar caminhos alternativos, como táxi e motoristas particulares.' }, { l: [['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }];
+    else if (tipo === 'festas') b = [{ t: 'Você está na área de Festas e Eventos. Posso ajudar a encontrar serviços para uma comemoração ou procurar o que está acontecendo na cidade.' }, { l: [['Abrir Festas e Eventos', R.base + '/p/festas-e-eventos.html'], ['Abrir a agenda', R.base + '/p/festas-e-eventos_27.html']] }];
+    else b = [{ t: 'Você está no Economizei! Rio Claro. Esta área ajuda a encontrar lugares, serviços e informações da cidade.' }, { t: 'Me diga o que você está procurando e eu te ajudo a escolher o melhor caminho.', l: atalhos() }];
+    return ok(b);
+  }
   function proximoHorario(r) {
     var hoje = new Date().getDay(), nomes = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'], i, idx, h;
     for (i = 1; i <= 7; i++) { idx = (hoje + i) % 7; h = r.d[idx]; if (!fechado(h)) return { dia: nomes[idx], horario: String(h).trim() }; }
     return null;
   }
   function respostaEsclarecimento() {
+    if (!CTX.item && ULTIMO_GUIA) return { blocos: [{ t: ULTIMO_GUIA }], achou: true };
     if (!CTX.item) return null;
     var r = CTX.item.r, h = hojeH(r), prox = proximoHorario(r), b = [];
     if (!h) {
@@ -413,9 +437,15 @@
     var q = normQ(txt), toksAll = tokens(txt), kind = ehFollowUp(q);
     var toks = kind ? toksAll.filter(function (t) { return !FU_WORDS[t]; }) : toksAll;
     var ach = acharCats(toks);
-    if (ehEsclarecimento(q) && ctxAtivo() && CTX.item) return Promise.resolve(respostaEsclarecimento());
+    if (ehEsclarecimento(q) && ((ctxAtivo() && CTX.item) || ULTIMO_GUIA)) return Promise.resolve(respostaEsclarecimento());
+    var pagina = respostaPagina(q);
+    if (pagina) return pagina;
+    if (ehSaudacao(q)) return ok([{ t: saudacao() + '! Eu sou o Rico. Quer descobrir um lugar, serviço, evento ou oportunidade em Rio Claro?' }, { l: atalhos() }]);
+    if (ehPedidoAmplo(q)) return ok([{ t: 'Claro! Eu posso te ajudar a encontrar um lugar ou serviço em Rio Claro. Você está pensando em comer, cuidar da saúde, trabalhar, passear ou outra coisa?' }, { l: atalhos() }]);
 
     function resto() {
+      var vit = responderVitrine(q);
+      if (vit) return vit;
       var esp = responderEspecial(q);
       if (esp) return esp;
       if (/\bonibus\b/.test(q) && /\b(horario|horarios|passa|sai|linha|linhas|tarifa|passagem)\b/.test(q))
@@ -508,6 +538,7 @@
         }
 
         var prox = proximas(toks.join(' '));
+        ULTIMO_GUIA = 'Eu quis dizer que ainda não consegui localizar essa informação do jeito que você pediu. Posso tentar com outra palavra, mostrar opções parecidas ou indicar um caminho para avisar a equipe.';
         var blocos = [{ t: 'Hmm… ainda não consegui localizar isso. Você pode me explicar de outro jeito? Às vezes uma palavra diferente já me ajuda a encontrar.' + (prox.length ? ' Talvez você esteja procurando por:' : '') }];
         if (prox.length) blocos.push({ l: prox.map(function (c) { return [c.nome, urlCat(c)]; }) });
         blocos.push({ t: 'Se quiser, eu posso te mostrar os caminhos que conheço ou você pode me dizer um pouco mais do que está procurando.', l: [['Ver Categorias', R.base + R.paginaCategorias], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] });
