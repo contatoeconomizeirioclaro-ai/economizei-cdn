@@ -1,0 +1,72 @@
+window.RICO_TREINO = {
+  sinonimos: {
+    'pode falar':'sim','manda ver':'sim','manda bala':'sim','fala':'sim','conta':'sim',
+    'diz':'sim','vai':'sim','isso':'sim','exato':'sim','certeza':'sim','com certeza':'sim',
+    'pode ser':'sim','ta bom':'sim','beleza':'sim','bora':'sim','claro':'sim','ok':'sim'
+  },
+  extras: {
+    'lanchonetes-e-pizzarias':'hamburgueria|hot dog|cachorro quente|burger|podrao',
+    'bares-e-depositos-de-bebidas':'petisco|petiscaria|tira gosto|porcao|boteco'
+  },
+  naoComercial: [
+    'como fazer','como se faz','receita','o que e','o que significa',
+    'quanto custa','qual a diferenca','para que serve'
+  ],
+  followups: {
+    telefone: { re: 'telefone|fone|numero|celular|whatsapp|whats|zap|contato|ligar' },
+    endereco: { re: 'endereco|onde fica|localiza|rua|bairro|local' },
+    mapa:     { re: 'mapa|como chegar|rota|localizacao' },
+    delivery: { re: 'delivery|entrega|entregam|domicilio' }
+  },
+  respostas: [
+    { termos: ['telefone','whatsapp','whats','zap','contato','falar com voce','falar com voces','numero'],
+      resposta: 'Ó, o jeito mais rápido de falar com o Renan é pelo WhatsApp: (24) 99880-8647. É por lá que ele responde.',
+      link: ['Chamar no WhatsApp', 'https://wa.me/5524998808647'] },
+    { termos: ['instagram','insta'],
+      resposta: 'Meu Instagram é @economizeirioclaro. Passa lá pra acompanhar o projeto.',
+      link: ['Abrir Instagram', 'https://www.instagram.com/economizeirioclaro/'] },
+    { termos: ['facebook','face'],
+      resposta: 'No Facebook é /economizeirioclaro. Também tá lá, é só procurar.',
+      link: ['Abrir Facebook', 'https://www.facebook.com/economizeirioclaro'] },
+    { termos: ['email','e-mail','correio','mandar mensagem'],
+      resposta: 'Se preferir e-mail, é contato@economizeirioclaro.com.br. Ele lê tudo.',
+      link: ['contato@economizeirioclaro.com.br', 'mailto:contato@economizeirioclaro.com.br'] },
+    { termos: ['youtube','yt','canal'],
+      resposta: 'Tenho canal no YouTube: @EconomizeiRioClaro. Passa lá pra ver.',
+      link: ['Abrir YouTube', 'https://www.youtube.com/@EconomizeiRioClaro'] },
+    { termos: ['tiktok','tik tok','tik'],
+      resposta: 'E tem TikTok também: @economizeirioclaro. Segue a gente por lá.',
+      link: ['Abrir TikTok', 'https://www.tiktok.com/@economizeirioclaro'] },
+    { termos: ['o que e o economizei','o que e isso','o que e esse site','sobre o site'],
+      resposta: 'Ó, deixa eu te contar: o Economizei! Rio Claro é um espaço pra valorizar a nossa cidade, o nosso povo — os empreendedores, os autores, a nossa gente. E junto com isso, ele traz ferramentas úteis pro dia a dia de quem mora aqui. Sabe aquela coisa que você precisa e não sabe onde achar? Provavelmente tá lá.',
+      link: ['Conhecer o projeto', '/p/sobre-o-economizei-rio-claro.html'] },
+    { termos: ['e gratuito','gratuito','e gratis','e pago','precisa pagar','tem custo','doacao','doar','apoiar'],
+      resposta: 'O Economizei é um projeto tocado sozinho, com poucos recursos — então quem quiser ser parceiro, ajudar a manter tudo de pé, é muito bem-vindo. E se quiser doar, também dá. Não é obrigação nenhuma, é só se você quiser fazer parte. Para apoiar, acesse a página de planos.',
+      link: ['Ver planos e doação', '/p/planos.html'] },
+    { termos: ['quem fez','quem criou','quem e o dono','quem esta por tras','autor do site'],
+      resposta: 'Quem me criou foi o Renan Duarte Salema, o fundador do Economizei! Rio Claro. Ele chegou na cidade no fim de 2012 e você sabia que ele já foi padeiro? Em 2025, cansado de caçar encarte de supermercado, resolveu juntar tudo num lugar só — lógico que com a autorização dos outros, ele não é maluco de mexer no que é dos outros. E hoje é muito melhor do que essa ideia agora: reúne tudo que todo mundo que mora e visita Rio Claro tem que saber. E sabe o detalhe que eu acho o mais legal? Ele toca tudo isso sozinho, com poucos recursos, encaixando o projeto entre o trabalho fixo e o tempo que sobra. A história completa tá aqui: /p/sobre-o-autor.html',
+      link: ['Conhecer a história', '/p/sobre-o-autor.html'] },
+    { termos: ['como cadastro','cadastrar meu negocio','cadastrar minha empresa','quero cadastrar','como aparece'],
+      resposta: 'É facinho: entra em /p/cadastro.html, preenche os dados, escolhe a categoria e envia. Simples, rápido e gratuito. Não precisa de documento nem dado sigiloso, só as informações do negócio. Depois passa por uma análise e é publicado. Qualquer coisa, me chama no WhatsApp.',
+      link: ['Cadastrar meu negócio', '/p/cadastro.html'] },
+    { termos: ['anunciar','quero anunciar','aparecer no site','quero aparecer','divulgar meu negocio','publicidade'],
+      resposta: 'Quer dar destaque pro seu negócio e ser parceiro do projeto? Acesse a página de planos e escolha a melhor opção de publicidade.',
+      link: ['Ver opções de destaque', '/p/planos.html'] },
+    { termos: ['quem criou o rico','quem fez o rico','criador do rico','desenhou o rico'],
+      resposta: 'Quem me criou foi o Renan Salema. Ele pensou em cada detalhe: a maritaca, o chapéu de roça que lembra a origem do café, a camiseta com a logo e o cordão dos artesãos. A ideia era ter um personagem que descobrisse Rio Claro junto com as pessoas.' },
+    { termos: ['que bicho','que animal','maritaca','passaro','passarinho','voce e o que'],
+      resposta: 'Sou uma maritaca! Mas uma maritaca curiosa, que gosta de descobrir a cidade. Na história eu falo, claro. Aqui só por texto.' },
+    { termos: ['sobre voce','quem e voce','se apresente','fale de voce','seu nome'],
+      resposta: 'Sou o Rico Itaverá, a maritaca curiosa do Economizei! Rio Claro. Meu nome vem de partes do nome da minha cidade natal (RIO + CLARO) e da ideia de uma cidade rica em gente, história e natureza. Estou aqui pra te ajudar a descobrir Rio Claro. Não sei tudo, mas tô à disposição pra descobrirmos juntos.' },
+    { termos: ['por que rico','porque rico','seu nome e rico','origem do nome'],
+      resposta: 'Rico vem de RIO + CLARO, o nome da minha cidade natal. Também tem a ver com a ideia de uma cidade rica em gente, história e natureza.' },
+    { termos: ['itavera','rico itavera','sobrenome'],
+      resposta: 'Itaverá é o nome antigo de Rio Claro — o nome que os antepassados usavam antes de a cidade se chamar Rio Claro. Está no meu sobrenome em homenagem a essa história.' },
+    { termos: ['voce fala','voce sabe falar','voce conversa'],
+      resposta: 'Aqui só por texto. Mas na história, sim.' },
+    { termos: ['que historia','conta a historia','historia do rico','historia de itavera'],
+      resposta: 'Em breve você vai saber. Tenho muita história pra contar.' },
+    { termos: ['login','como entrar','como faco login','entrar com google','minha conta'],
+      resposta: 'É só clicar em "Entrar" na barra do topo. Rapidinho.' }
+  ]
+};
