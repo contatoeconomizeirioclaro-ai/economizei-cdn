@@ -1,0 +1,54 @@
+#rico { --rico-azul: #1a3463; --rico-dourado: #e2aa22; position: fixed; right: 20px; bottom: calc(82px + env(safe-area-inset-bottom, 0px)); z-index: 99999; font-family: 'Open Sans', Arial, sans-serif; }
+html.app-webview #rico { display: none; }
+html.app-view #rico { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
+html.app-view #rico.rico-recolhido { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
+#rico .rico-fab { display: flex; align-items: center; gap: 8px; width: 64px; height: 64px; padding: 0; border: 2px solid var(--rico-dourado); border-radius: 50%; background: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(26, 52, 99, .35); overflow: hidden; transition: width .2s ease, border-radius .2s ease, transform .15s ease; }
+#rico .rico-fab img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+#rico .rico-fab-label { display: none; font-size: 13px; font-weight: 700; color: var(--rico-azul); padding: 0 14px 0 4px; white-space: nowrap; }
+#rico.rico-recolhido { right: 0; bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
+#rico.rico-recolhido .rico-fab { width: 38px !important; min-width: 38px; height: 86px; justify-content: center; border: 2px solid var(--rico-dourado); border-right: 0; border-radius: 14px 0 0 14px; padding: 0; background: var(--rico-azul); box-shadow: 0 4px 14px rgba(26, 52, 99, .35); }
+#rico.rico-recolhido .rico-fab img { display: none; }
+#rico.rico-recolhido .rico-fab-label { display: inline; padding: 0; color: #fff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; line-height: 1; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
+#rico .rico-fab:focus-visible, #rico .rico-hide:focus-visible, #rico .rico-x:focus-visible, #rico .rico-send:focus-visible, #rico .rico-in:focus-visible, #rico .rico-bt:focus-visible, #rico .rico-balao button:focus-visible { outline: 3px solid var(--rico-dourado); outline-offset: 2px; }
+#rico .rico-panel { position: fixed; right: 20px; bottom: 96px; z-index: 100000; width: min(380px, calc(100vw - 32px)); height: min(560px, calc(100dvh - 140px)); max-height: calc(100dvh - 112px); display: flex; flex-direction: column; background: #fff; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(26, 52, 99, .3); opacity: 0; visibility: hidden; transform: translateY(12px) scale(.98); transition: opacity .18s ease, transform .18s ease, visibility .18s; pointer-events: none; }
+#rico.rico-open .rico-panel { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+#rico .rico-top { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--rico-azul); color: #fff; border-bottom: 3px solid var(--rico-dourado); flex-shrink: 0; }
+#rico .rico-top img { width: 44px; height: 44px; border-radius: 50%; background: #fff; object-fit: contain; }
+#rico .rico-nome { flex: 1; font-size: 15px; font-weight: 700; line-height: 1.2; }
+#rico .rico-nome small { display: block; font-size: 12px; font-weight: 400; opacity: .85; }
+#rico .rico-hide { width: 34px; height: 34px; border: 0; background: transparent; color: #fff; font-size: 24px; line-height: 1; cursor: pointer; border-radius: 50%; }
+#rico .rico-hide:hover, #rico .rico-x:hover { background: rgba(255,255,255,.12); }
+#rico .rico-x { width: 44px; height: 44px; border: 0; background: transparent; color: #fff; font-size: 26px; line-height: 1; cursor: pointer; border-radius: 50%; }
+#rico .rico-msgs { flex: 1; overflow-y: auto; padding: 12px; background: #f8fafc; overscroll-behavior: contain; }
+#rico .rico-m { max-width: 88%; margin: 0 0 10px; padding: 9px 12px; border-radius: 12px; font-size: 14px; line-height: 1.45; word-wrap: break-word; animation: ricoEntraMsg .18s ease-out; }
+#rico .rico-m.rico-bot { background: #fff; border: 1px solid #cbd5e1; color: #1e293b; }
+#rico .rico-m.rico-eu { margin-left: auto; background: var(--rico-azul); color: #fff; }
+#rico .rico-typing { display: inline-flex; gap: 4px; padding: 12px 14px; }
+#rico .rico-typing span { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: ricoPulsa 1s infinite ease-in-out; }
+#rico .rico-typing span:nth-child(2) { animation-delay: .15s; }
+#rico .rico-typing span:nth-child(3) { animation-delay: .3s; }
+#rico .rico-links { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 10px; }
+#rico .rico-bt { display: inline-block; max-width: 100%; padding: 9px 14px; border: 1px solid var(--rico-azul); border-radius: 999px; background: #fff; color: var(--rico-azul); font: inherit; font-size: 13px; font-weight: 700; line-height: 1.25; text-align: left; text-decoration: none; cursor: pointer; animation: ricoEntraMsg .2s ease-out backwards; }
+#rico .rico-bt:hover { background: var(--rico-azul); color: #fff; }
+#rico .rico-form { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #cbd5e1; background: #fff; flex-shrink: 0; }
+#rico .rico-in { flex: 1; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 999px; font: inherit; font-size: 16px; color: #1e293b; background: #fff; }
+#rico .rico-send { height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--rico-dourado); color: var(--rico-azul); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+#rico .rico-balao { position: absolute; right: 76px; bottom: 8px; width: max-content; max-width: 220px; padding: 10px 30px 8px 12px; border: 1px solid #cbd5e1; border-radius: 12px; background: #fff; box-shadow: 0 4px 14px rgba(26, 52, 99, .25); animation: ricoEntraMsg .25s ease-out; }
+#rico .rico-balao::after { content: ''; position: absolute; right: -7px; bottom: 20px; width: 12px; height: 12px; background: #fff; border-right: 1px solid #cbd5e1; border-top: 1px solid #cbd5e1; transform: rotate(45deg); }
+#rico .rico-balao-t { display: block; padding: 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--rico-azul); text-align: left; cursor: pointer; }
+#rico .rico-balao-x { position: absolute; top: 2px; right: 2px; width: 28px; height: 28px; border: 0; background: none; font-size: 20px; line-height: 1; color: #64748b; cursor: pointer; }
+#rico .rico-balao-m { display: block; margin-top: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 11px; color: #64748b; text-decoration: underline; cursor: pointer; }
+@keyframes ricoEntraMsg { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes ricoPulsa { 0%, 80%, 100% { transform: scale(.6); opacity: .5; } 40% { transform: scale(1); opacity: 1; } }
+@media (max-width: 480px) {
+  #rico { right: 12px; }
+  html.app-view #rico { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
+html.app-view #rico.rico-recolhido { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
+  #rico .rico-panel { position: fixed; right: 0; left: 0; bottom: 0; top: 0; width: auto; height: auto; border-radius: 0; border: 0; transform: translateY(20px) scale(.98); }
+  #rico.rico-open .rico-panel { transform: none; }
+  #rico .rico-balao { max-width: calc(100vw - 112px); }
+}
+@media (prefers-reduced-motion: no-preference) { #rico .rico-fab:hover { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) {
+  #rico .rico-panel, #rico .rico-m, #rico .rico-bt, #rico .rico-balao, #rico .rico-typing span, #rico .rico-fab { animation: none !important; transition: none !important; }
+}
