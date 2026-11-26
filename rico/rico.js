@@ -148,10 +148,12 @@
   function ehEvento(q) { return /\b(evento|eventos|show|shows|festa|festas|feira|exposicao|exposição|agenda|rolando|acontece)\b/.test(q); }
   function ehVaga(q) { return /\b(vaga|vagas|emprego|empregos|trabalho|estagio|estágio|contratando|oportunidade)\b/.test(q); }
   function ehOnibus(q) { return /\b(onibus|ônibus|linha|linhas|passagem|tarifa|itinerario|itinerário)\b/.test(q); }
+  function ehOnibusGenerico(q) { var t = norm(q).split(' ').filter(function (x) { return x && ['onibus','linha','linhas','passagem','tarifa','itinerario','horario','horarios','tem','voce','voces','qual','quais','de','do','da','um','uma'].indexOf(x) < 0; }); return ehOnibus(q) && !t.length; }
   function ehVitrine(q) { return /\b(livro|livros|autor|autora|autores|vitrine do escritor|escritor)\b/.test(q); }
   function responderVitrine(q) {
     if (!ehVitrine(q)) return null;
     var n = norm(q);
+    if (!tokens(q).some(function (t) { return ['livro','livros','autor','autora','autores','vitrine','escritor'].indexOf(t) < 0; })) { ULTIMO_GUIA = 'A Vitrine do Escritor reúne livros e autores de Rio Claro. Posso abrir a Vitrine para você conhecer as obras disponíveis.'; return ok([{ t: 'Claro! A Vitrine do Escritor reúne livros e autores de Rio Claro.' }, { t: 'Você pode conhecer as obras disponíveis ou avisar um autor para solicitar a inclusão de um livro.' }, { l: [['Abrir a Vitrine do Escritor', R.base + '/p/vitrine-do-escritor.html'], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }]); }
     if (/\b(livro|livros|autor|autora|autores|vitrine|escritor)\b/.test(n)) { ULTIMO_GUIA = 'Eu quis dizer que ainda não localizei esse título ou autor na Vitrine. Posso te mostrar a Vitrine, ajudar a encontrar outros autores ou orientar o autor sobre como solicitar a inclusão.'; return ok([{ t: 'Ainda não localizei esse título ou autor na Vitrine do Escritor.' }, { t: 'Mas posso te ajudar a continuar: você pode conhecer os autores e livros disponíveis, ou avisar o autor para solicitar a inclusão da obra.' }, { l: [['Abrir a Vitrine do Escritor', R.base + '/p/vitrine-do-escritor.html'], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }]); }
     return null;
   }
@@ -364,7 +366,7 @@
     return { blocos: [{ t: r.titulo }, { l: r.grupos.map(function (g) { return [g.nome, urlGrupo(g)]; }) }], achou: true };
   }
   function ehEsclarecimento(q) { return /^(como assim|o que quer dizer|nao entendi|não entendi|explica|explique)\b/.test(q); }
-  function ehPagina(q) { return /\b(como funciona|onde estou|em que pagina|qual pagina|o que tem nesta pagina|o que tem nessa pagina)\b/.test(q); }
+  function ehPagina(q) { return /\b(como funciona|onde estou|em que pagina|qual pagina|que pagina|o que tem nesta pagina|o que tem nessa pagina)\b/.test(q); }
   function ehSaudacao(q) { return /^(oi|ola|olá|bom dia|boa tarde|boa noite|e ai|e aí|tudo bem)\b/.test(q); }
   function ehPedidoAmplo(q) { return /\b(quero um lugar|preciso de um lugar|me ajuda|pode me ajudar|estou procurando algo|quero encontrar algo)\b/.test(q); }
   function respostaPagina(q) {
@@ -442,8 +444,14 @@
     if (pagina) return pagina;
     if (ehSaudacao(q)) return ok([{ t: saudacao() + '! Eu sou o Rico. Quer descobrir um lugar, serviço, evento ou oportunidade em Rio Claro?' }, { l: atalhos() }]);
     if (ehPedidoAmplo(q)) return ok([{ t: 'Claro! Eu posso te ajudar a encontrar um lugar ou serviço em Rio Claro. Você está pensando em comer, cuidar da saúde, trabalhar, passear ou outra coisa?' }, { l: atalhos() }]);
+    var vitrine = responderVitrine(q);
+    if (vitrine) return vitrine;
+    if (ehOnibus(q)) {
+      var onibus = responderEspecial(q);
+      if (onibus) return ehOnibusGenerico(q) ? ok([{ t: 'Claro! Posso te ajudar a consultar os horários de ônibus. Se uma linha estiver ausente ou desatualizada, também posso indicar alternativas como táxi e motoristas particulares.' }, { l: [['Abrir Horários de ônibus', R.base + '/p/horario-de-onibus.html'], ['Falar com a equipe', 'https://wa.me/' + R.whatsapp]] }]) : onibus;
+    }
 
-    function resto() {
+function resto() {
       var vit = responderVitrine(q);
       if (vit) return vit;
       var esp = responderEspecial(q);
