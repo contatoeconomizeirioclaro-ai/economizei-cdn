@@ -210,8 +210,10 @@
   function slotDoArtigo() {
     var s = document.querySelector('.eb-slot');
     if (s) return;
+    var cl = document.body.classList;
+    if (!cl.contains('item') || cl.contains('static_page')) return;   // só em artigo (páginas fixas também têm .item-post)
     var corpo = document.querySelector('.item-post .post-body');
-    if (!corpo) return;                                  // só em página de artigo
+    if (!corpo) return;
     s = el('div', 'eb-slot');
     s.setAttribute('data-espaco', 'artigos');
     var p1 = corpo.querySelector('p');
