@@ -3,7 +3,7 @@ html.app-webview #rico { display: none; }
 html.app-view #rico { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
 html.app-view #rico.rico-recolhido { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
 #rico .rico-fab { display: flex; align-items: center; gap: 8px; width: 64px; height: 64px; padding: 0; border: 2px solid var(--rico-dourado); border-radius: 50%; background: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(26, 52, 99, .35); overflow: hidden; transition: width .2s ease, border-radius .2s ease, transform .15s ease; }
-#rico .rico-fab img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+#rico .rico-fab img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; transform-origin: 50% 90%; }
 #rico .rico-fab-label { display: none; font-size: 13px; font-weight: 700; color: var(--rico-azul); padding: 0 14px 0 4px; white-space: nowrap; }
 #rico.rico-recolhido { right: 0; bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
 #rico.rico-recolhido .rico-fab { width: 38px !important; min-width: 38px; height: 86px; justify-content: center; border: 2px solid var(--rico-dourado); border-right: 0; border-radius: 14px 0 0 14px; padding: 0; background: var(--rico-azul); box-shadow: 0 4px 14px rgba(26, 52, 99, .35); }
@@ -39,6 +39,7 @@ html.app-view #rico.rico-recolhido { bottom: calc(182px + env(safe-area-inset-bo
 #rico .rico-balao-x { position: absolute; top: 2px; right: 2px; width: 28px; height: 28px; border: 0; background: none; font-size: 20px; line-height: 1; color: #64748b; cursor: pointer; }
 #rico .rico-balao-m { display: block; margin-top: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 11px; color: #64748b; text-decoration: underline; cursor: pointer; }
 @keyframes ricoEntraMsg { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes ricoFlutua { 0%, 100% { transform: translateY(0) rotate(0deg); } 35% { transform: translateY(-2px) rotate(-1deg); } 70% { transform: translateY(1px) rotate(1deg); } }
 @keyframes ricoPulsa { 0%, 80%, 100% { transform: scale(.6); opacity: .5; } 40% { transform: scale(1); opacity: 1; } }
 @media (max-width: 480px) {
   #rico { right: 12px; }
@@ -48,7 +49,11 @@ html.app-view #rico.rico-recolhido { bottom: calc(182px + env(safe-area-inset-bo
   #rico.rico-open .rico-panel { transform: none; }
   #rico .rico-balao { max-width: calc(100vw - 112px); }
 }
-@media (prefers-reduced-motion: no-preference) { #rico .rico-fab:hover { transform: scale(1.06); } }
+@media (prefers-reduced-motion: no-preference) {
+  #rico .rico-fab:hover { transform: scale(1.06); }
+  #rico:not(.rico-open) .rico-fab img { animation: ricoFlutua 3.8s ease-in-out infinite; }
+  #rico .rico-top img { animation: ricoFlutua 4.6s ease-in-out infinite; }
+}
 @media (prefers-reduced-motion: reduce) {
   #rico .rico-panel, #rico .rico-m, #rico .rico-bt, #rico .rico-balao, #rico .rico-typing span, #rico .rico-fab { animation: none !important; transition: none !important; }
 }
