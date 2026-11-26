@@ -3,7 +3,7 @@ window.RICO_CONFIG = {
   imgBolha: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhGuCd0H0e44MjvjwlZUvT9sMFemRFiD_-h6UwqXIdocu6pvLrV_913w25xPwuipFYXk-n8HMFUEfHLGNXtJWndEfed4iGUNAfKmDgS8w0xAJUXdCwm0UbW0xdsfFekCCZp-rTUw-TTEUKsIt6Hlxg9wQDMWi-VxZAhJqmnLws8ut8zjuPQuf9rUkdUhA/s1600/rico-160.webp',
   imgPainel: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjtCsCYvEHw1murf_j-p4fiT2VPkjMXO_XJr4eiR5j6qjWzwl2pQcvXLVUHAgV9iqrFoBN0Y9EftcVLTEb5Ok3uAmPW9mR3ojyoToEDVJc0JdCH6KknWA2P8Wn8DJNTzkofQcg9xk24S9xBeUAD3qCC5HCToZlQsXeCpigDBnvbkBsIrmJd_ZN7nHQnA/s320/Rico-base-com-chapeu-sem-fundo1.webp',
   whatsapp: '5524998808647', email: 'contato@economizeirioclaro.com.br', paginaCategorias: '/p/categorias.html', paginaCadastro: '/p/cadastro.html', paginaOnibus: '/p/horario-de-onibus.html',
-  atalhos: [['Onde Comer','/p/onde-comer_13.html'],['Categorias','/p/categorias.html']],
+  atalhos: [['Categorias','/p/categorias.html']],
   dicas: {
     home: [{ b:'Procurando livros?', t:'A Vitrine do Escritor tem os livros dos autores de Rio Claro.', l:['Abrir Vitrine','/p/vitrine-do-escritor.html'] }, { b:'Procurando emprego?', t:'As vagas de Rio Claro ficam em Empregos e Estágios.', l:['Abrir Vagas','/p/empregos-e-estagios.html'] }],
     categorias: [{ b:'Sabia que dá para recolher os grupos?', t:'Toque no "V" ao lado do nome do grupo para recolher. Fica mais fácil achar.' }],
