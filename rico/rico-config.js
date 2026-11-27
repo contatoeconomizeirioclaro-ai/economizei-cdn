@@ -1,7 +1,7 @@
 window.RICO_CONFIG = {
   ligado: true, base: '',
     imgBolha: 'https://cdn.jsdelivr.net/gh/contatoeconomizeirioclaro-ai/economizei-cdn@main/rico/rico-icone.png',
-  imgPainel: 'https://cdn.jsdelivr.net/gh/contatoeconomizeirioclaro-ai/economizei-cdn@main/rico/rico-chat.png',
+  imgPainel: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEibiS8ck8J0iqlT7N_2dMj9TkZi5GS90E-QwmElTGmL4zgSb82y8UWJOzxZGXqOYixQFu660uY9GDEup8kGdb6JHYZ7EFDNOy_MCCbr3Bk4jfmEPHdhtl_as4Ja208UvU6YSygsaHEoYopMtKzw1i8lOWh27xk3OxAx8v2NWUUgDjnz1vO-f9w9zyttfQ/s1600/rico-chat-piscando.gif',
   whatsapp: '5524998808647', email: 'contato@economizeirioclaro.com.br', paginaCategorias: '/p/categorias.html', paginaCadastro: '/p/cadastro.html', paginaOnibus: '/p/horario-de-onibus.html',
   atalhos: [['Categorias','/p/categorias.html']],
   dicas: {
