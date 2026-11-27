@@ -1,58 +1,119 @@
-window.RICO_CONFIG = {
-  ligado: true, base: '',
-    imgBolha: 'https://cdn.jsdelivr.net/gh/contatoeconomizeirioclaro-ai/economizei-cdn@main/rico/rico-icone.png',
-  imgPainel: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEibiS8ck8J0iqlT7N_2dMj9TkZi5GS90E-QwmElTGmL4zgSb82y8UWJOzxZGXqOYixQFu660uY9GDEup8kGdb6JHYZ7EFDNOy_MCCbr3Bk4jfmEPHdhtl_as4Ja208UvU6YSygsaHEoYopMtKzw1i8lOWh27xk3OxAx8v2NWUUgDjnz1vO-f9w9zyttfQ/s1600/rico-chat-piscando.gif',
-  whatsapp: '5524998808647', email: 'contato@economizeirioclaro.com.br', paginaCategorias: '/p/categorias.html', paginaCadastro: '/p/cadastro.html', paginaOnibus: '/p/horario-de-onibus.html',
-  atalhos: [['Categorias','/p/categorias.html']],
-  dicas: {
-    home: [{ b:'Procurando livros?', t:'A Vitrine do Escritor tem os livros dos autores de Rio Claro.', l:['Abrir Vitrine','/p/vitrine-do-escritor.html'] }, { b:'Procurando emprego?', t:'As vagas de Rio Claro ficam em Empregos e Estágios.', l:['Abrir Vagas','/p/empregos-e-estagios.html'] }],
-    categorias: [{ b:'Sabia que dá para recolher os grupos?', t:'Toque no "V" ao lado do nome do grupo para recolher. Fica mais fácil achar.' }],
-    grupo: [{ b:'Quer saber o que está aberto agora?', t:'Eu consulto os horários daqui e te digo o que está aberto neste momento.' }],
-    default: [{ b:'Posso ajudar a encontrar algo?', t:'Me diga o que você procura: um lugar, um serviço, uma vaga.' }]
-  },
-  planilhas: [
-    {
-      gid: 'onde-comer', pagina: '/p/onde-comer_13.html',
-      csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQDjt28EfGD2FfakWRKT2dy-8v9GZS6tj_HmrFx6RaMYO9MFNklHF4NnpDUR1UeGsNkt3vYR9-y3amy/pub?output=csv',
-      col: { nome: 0, cat: 1, sub: 2, hor: 7, obs: 10, ativo: 12, slug: 14, dias: [30,24,25,26,27,28,29], verificado: 18, whatsapp: 5, maps: 6, delivery: 8, cardapio: 11, instagram: 22, busca: [2,3,10] }
-    },
-    {
-      gid: 'saude', pagina: '/p/saude.html',
-      csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtm7pE0YcI19APs9uWjNqu4fbKebiF-JZI7QFtqZ0Ww52zaBivaBsdZ-C9aERruFLgBUQsEpnGQC6o/pub?output=csv',
-      col: { nome: 0, cat: 1, sub: 2, hor: 7, obs: 8, ativo: 10, slug: 12, dias: [25,25,25,25,25,25,25], verificado: 16, whatsapp: 5, maps: 6, instagram: 23, busca: [2,3,8,18,19,20] }
-    }
-  ],
-  especiais: {
-    eventos: { pagina: '/p/festas-e-eventos_27.html', csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5nJHH9pLqswyti_-XXWD0aDjAtwzI9A5_qEnBU3Xior3GSeF59EjTfi3SVRg7NEmXInWl68X5uJo8/pub?output=csv' },
-    vagas: { pagina: '/p/empregos-e-estagios.html', csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmwJESDbUNCHj28zEMCc8PT6G93eqkNdiF2focFhukXkgpSytgqnoko6SqtAFJuIFaUMJO27lOZZGY/pub?output=csv' },
-    onibus: { pagina: '/p/horario-de-onibus.html', csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSaMOpcnP7o4gIbb6-_j9wofXt8MxKc6mn-bq4jHaX6tnvZl59XXis76YKHqHK-kqDLDoQ2RTrWzual/pub?output=csv' }
+/* Economizei! Rio Claro — "Economizei indica"
+   Monta o carrossel a partir dos gadgets das seções #indica-home e #indica-pagina:
+   - gadget "Imagem": imagem (upload/URL), link, título e legenda;
+   - gadget "HTML": blocos <a class="ind-of"> (com selo, local e preços).
+   Cada seção é posicionada no lugar certo da página. */
+(function () {
+  'use strict';
+  var INTERVALO = 6500;
+  var AVISO = 'Link de afiliado \u2014 podemos ganhar uma comiss\u00e3o em compras feitas por aqui, sem custo extra pra voc\u00ea.';
+  var reduzir = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function txt(n) { return n ? (n.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
+  function tem(n, c) { return n.nodeType === 1 && (' ' + n.className + ' ').indexOf(' ' + c + ' ') > -1; }
+
+  function posicionar(sec, seletor) {
+    var alvo = document.querySelector(seletor);
+    if (alvo && alvo.parentNode) alvo.parentNode.insertBefore(sec, alvo);
   }
-};
 
+  /* gadget "Imagem" -> oferta */
+  function deImagem(w) {
+    var img = w.querySelector('img');
+    if (!img || !img.getAttribute('src')) return null;
+    var link = img.parentNode && img.parentNode.tagName === 'A' ? img.parentNode : w.querySelector('a');
+    var titulo = (img.getAttribute('alt') || '').trim() || txt(w.querySelector('h2,h3,.title'));
+    var legenda = txt(w.querySelector('.caption'));
+    var a = el('a', 'ind-of');
+    if (link && link.getAttribute('href')) { a.href = link.getAttribute('href'); a.target = '_blank'; a.rel = 'noopener sponsored'; }
+    var im = el('img'); im.src = img.getAttribute('src'); a.appendChild(im);
+    if (titulo || legenda) a.appendChild(el('strong', 'ind-titulo', titulo || legenda));
+    if (titulo && legenda) a.appendChild(el('span', 'ind-local', legenda));
+    return a;
+  }
 
-window.RICO_DADOS = {
-  // Termos extras que o Rico entende (por filtro). É aqui que você ensina palavras novas.
-  extras: {
-    'lanchonetes-e-pizzarias': 'hamburgueria|hamburgueria artesanal|hot dog|cachorro quente'
-  },
-  grupos: [
-    ['destaques', 'Destaques', '/p/destaques.html', [['Táxis', 'taxis', 'taxi'], ['Artesãos', 'artesaos', 'artesanato|artesanal'], ['Produtores Rurais e Produtos da Roça', 'produtores-rurais-e-produtos-da-roca', 'produtor rural|sitio|fazenda|roca']]],
-    ['onde-comer', 'Onde Comer', '/p/onde-comer_13.html', [['Restaurantes e Marmitarias', 'restaurantes-e-marmitarias', 'comida|almoco|marmita|prato feito|pf|restaurante'], ['Lanchonetes e Pizzarias', 'lanchonetes-e-pizzarias', 'lanche|pizza|hamburguer|hamburger|burger|lanchonete'], ['Padarias, Confeitarias e Cafés', 'padarias-confeitarias-e-cafes', 'pao|padaria|bolo|cafe|confeitaria'], ['Açaí e Sorvetes', 'acai-e-sorvetes', 'acai|sorvete|sorveteria|gelado'], ['Bares e Depósitos de Bebidas', 'bares-e-depositos-de-bebidas', 'bar|bebida|cerveja|deposito de bebida'], ['Trailers e Carrocinhas', 'trailers-e-carrocinhas', 'trailer|carrocinha|comida de rua'], ['Pastelarias e Salgaderias', 'pastelarias-e-salgaderias', 'pastel|salgado|coxinha|pastelaria'], ['Churrasquinhos', 'churrasquinhos', 'churrasco|espetinho'], ['Produtos Artesanais', 'produtos-artesanais', 'artesanal|artesanato'], ['Delícias Caseiras', 'delicias-caseiras', 'comida caseira|doce caseiro']]],
-    ['mercados', 'Mercados e Suprimentos', '/p/mercados-e-suprimentos.html', [['Supermercados e Mercados', 'supermercados-e-mercados', 'mercado|supermercado'], ['Açougues e Peixarias', 'acougues-e-peixarias', 'acougue|carne|peixaria|peixe'], ['Hortifrúti', 'hortifruti', 'verdura|fruta|legume|feira|hortifruti'], ['Depósito de Gás, Água e Gelo', 'deposito-de-gas-agua-gelo', 'gas|agua|gelo|botijao']]],
-    ['casa', 'Casa e Decoração', '/p/casa-e-decoracao.html', [['Móveis e Eletrodomésticos', 'moveis-e-eletrodomesticos', 'movel|moveis|eletrodomestico|geladeira|fogao'], ['Lojas de Decoração', 'lojas-de-decoracao', 'decoracao|enfeite'], ['Floriculturas', 'floriculturas', 'flor|floricultura|buque'], ['Armarinhos', 'armarinhos', 'armarinho|linha|aviamento']]],
-    ['construcao', 'Construção e Obras', '/p/construcao-e-obras.html', [['Profissionais da Construção', 'profissionais-da-construcao', 'pedreiro|pintor|eletricista|encanador|construcao'], ['Materiais de Construção, Madeireiras e Marmorarias', 'materiais-de-construcao-madeireiras-e-marmorarias', 'material de construcao|madeira|marmore|granito'], ['Serralherias e Vidraçarias', 'serralherias-e-vidracarias', 'serralheria|vidracaria|portao|vidro|grade'], ['Arquitetura e Engenharia', 'arquitetura-e-engenharia', 'arquiteto|engenheiro|projeto'], ['Terraplanagem', 'terraplanagem', 'terraplenagem|escavacao|trator'], ['Aluguel de Máquinas', 'aluguel-de-maquinas', 'aluguel de maquina|betoneira|andaime']]],
-    ['servicos-profissionais', 'Serviços Profissionais', '/p/servicos-profissionais.html', [['Fotógrafos', 'fotografos', 'foto|fotografia|fotografo'], ['Contadores e Escritórios', 'contadores-e-escritorios', 'contador|contabilidade|contabil'], ['Advocacia', 'Advocacia', 'advogado|advogada|juridico'], ['Serviços Financeiros e Consultorias', 'servicos-financeiros-e-consultorias', 'financeiro|consultoria|emprestimo']]],
-    ['saude', 'Saúde', '/p/saude.html', [['Farmácias', 'farmacias', 'farmacia|remedio'], ['Clínicas e Consultórios', 'clinicas-e-consultorios', 'clinica|consultorio|medico'], ['Laboratórios', 'laboratorios', 'laboratorio|exame|sangue'], ['Dentistas', 'dentistas', 'dentista|odontologia|dente'], ['Óticas', 'oticas', 'otica|oculos'], ['Outros Profissionais da Saúde', 'outros-profissionais-da-saude', 'fisioterapeuta|psicologo|nutricionista']]],
-    ['beleza', 'Beleza e Cuidado Pessoal', '/p/beleza-e-cuidado-pessoal.html', [['Salões e Barbearias', 'saloes-e-barbearias', 'salao|barbearia|cabelo|barbeiro|cabeleireiro'], ['Esteticistas', 'esteticistas', 'estetica|esteticista'], ['Manicures e Pedicures', 'manicures-e-pedicures', 'manicure|pedicure|unha'], ['Design de Sobrancelhas', 'design-de-sobrancelhas', 'sobrancelha'], ['Podólogas', 'podologas', 'podologia|podologa|pe'], ['Academias', 'academias', 'academia|ginastica|musculacao|treino']]],
-    ['automotivo', 'Serviços Automotivos e de Motos', '/p/servicos-automotivos-e-de-motos.html', [['Postos de Combustível', 'postos-de-combustivel', 'posto|gasolina|combustivel|alcool'], ['Oficinas e Autopeças', 'oficinas-e-autopecas', 'mecanico|mecanica|oficina|autopeca|conserto de carro'], ['Borracharias', 'borracharias', 'borracharia|pneu'], ['Funilaria e Lanternagem', 'funilaria-e-lanternagem', 'funilaria|lanternagem|bater e pintar'], ['Mecânica e Peças para Motos', 'mecanica-e-pecas-para-motos', 'mecanico de moto|moto|oficina de moto'], ['Elétrica e Som Automotivo', 'eletrica-e-som-automotivo', 'som automotivo|eletrica do carro|alarme'], ['Lava Jato', 'lava-jato', 'lavagem|lava rapido']]],
-    ['transporte', 'Transporte de Pessoas e Cargas', '/p/transporte-de-pessoas-e-cargas.html', [['Motoristas Particulares', 'motoristas-particulares', 'motorista|carona'], ['Fretes e Carretos', 'fretes-e-carretos', 'frete|carreto|mudanca'], ['Reboques', 'reboques', 'reboque|guincho'], ['Aluguel de Vans e Ônibus', 'aluguel-de-vans-e-onibus', 'van|onibus|excursao']]],
-    ['educacao', 'Educação, Aulas e Treinamentos', '/p/educacao-aulas-e-treinamentos.html', [['Escolas e Faculdades', 'escolas-e-faculdades', 'escola|faculdade|colegio|universidade'], ['Cursos', 'cursos', 'curso'], ['Aulas de Reforço', 'aulas-de-reforco', 'reforco escolar|aula particular'], ['Artes Marciais', 'artes-marciais', 'jiu jitsu|judo|karate|muay thai|luta'], ['Aulas de Dança', 'aulas-de-danca', 'danca|ballet'], ['Aulas de Esporte', 'aulas-de-esporte', 'esporte|futebol|natacao'], ['Aulas de Música', 'aulas-de-musica', 'musica|violao|piano|bateria']]],
-    ['festas', 'Festas e Eventos', '/p/festas-e-eventos.html', [['Salões e Espaços para Festas', 'saloes-e-espacos-para-festas', 'salao de festa|espaco de festa|buffet infantil'], ['Buffets e Decoração', 'buffets-e-decoracao', 'buffet|decoracao de festa'], ['Doces e Salgados', 'doces-e-salgados', 'doce|salgadinho|bolo de festa'], ['DJs, Cantores e Grupos Musicais', 'djs-cantores-e-grupos-musicais', 'dj|cantor|banda|musica ao vivo'], ['Aluguel (Som, Cadeiras e Estruturas)', 'aluguel-som-cadeiras-e-estruturas', 'aluguel de cadeira|aluguel de som|tenda'], ['Brinquedos e Recreação', 'brinquedos-e-recreacao', 'pula pula|recreacao|brinquedo']]],
-    ['residenciais', 'Serviços Residenciais', '/p/servicos-residenciais.html', [['Babás', 'Babás', 'baba'], ['Diaristas / Faxineiras', 'Diaristas / Faxineiras', 'faxina|limpeza|diarista'], ['Cuidador(a) de Idosos', 'Cuidador(a) de Idosos', 'cuidador de idoso|acompanhante'], ['Cuidador(a) Infantil', 'Cuidador(a) Infantil', 'cuidadora infantil'], ['Jardineiro(a)', 'Jardineiro(a)', 'jardim|jardinagem'], ['Caseiro(a)', 'Caseiro(a)', 'caseiro'], ['Cuidador(a) de Animais (Pet Sitter)', 'Cuidador(a) de Animais (Pet Sitter)', 'pet sitter|passeador de cachorro']]],
-    ['solucoes', 'Serviços e Soluções', '/p/servicos-e-solucoes.html', [['Provedores de Internet', 'provedores-de-internet', 'internet|wifi|provedor'], ['Papelarias', 'papelarias', 'papelaria|material escolar'], ['Agências de Veículos', 'agencias-de-veiculos', 'venda de carro|agencia de veiculo'], ['Chaveiro', 'chaveiro', 'chave|fechadura'], ['Gráficas', 'graficas', 'grafica|impressao|panfleto'], ['Loja de Variedades', 'loja-de-variedades', 'bazar|variedades'], ['Manutenção de Computadores e Celulares', 'manutencao-computadores-celulares', 'conserto de celular|conserto de computador|assistencia tecnica de celular'], ['Refrigeração', 'refrigeracao', 'ar condicionado|conserto de geladeira'], ['Assistência Técnica e Autorizada', 'assistencia-tecnica-autorizada', 'assistencia tecnica']]],
-    ['turismo', 'Turismo e Hospedagem', '/p/turismo-e-hospedagem.html', [['Hotéis e Pousadas', 'hoteis-e-pousadas', 'hotel|pousada|hospedagem'], ['Excursões', 'excursoes', 'excursao|passeio|viagem'], ['Guias e Condutores Turísticos', 'guias-e-condutores-turisticos', 'guia turistico']]],
-    ['pets', 'Animais Domésticos (Pets)', '/p/animais-domesticos-pets.html', [['Veterinários', 'veterinarios', 'veterinario|vet'], ['Clínicas Veterinárias', 'clinicas-veterinarias', 'clinica veterinaria'], ['Pet Shops', 'pet-shops', 'petshop|pet shop|racao'], ['Banho e Tosa', 'banho-e-tosa', 'tosa']]],
-    ['campo', 'Campo e Grandes Animais', '/p/campo-e-grandes-animais.html', [['Agropecuárias', 'agropecuarias', 'agropecuaria|racao animal'], ['Veterinários (Grande Porte)', 'veterinarios-grandes', 'veterinario de gado|grande porte']]],
-    ['moda', 'Moda', '/p/moda.html', [['Lojas de Roupas (feminina, masculina, infantil)', 'lojas-de-roupas', 'roupa|loja de roupa'], ['Sapatarias', 'sapatarias', 'sapato|calcado|sapataria'], ['Lojas de Acessórios (bolsas, bijuterias, cintos)', 'lojas-de-acessorios', 'bolsa|bijuteria|cinto|acessorio'], ['Moda Íntima e Lingerie', 'moda-intima', 'lingerie|moda intima'], ['Moda Fitness e Esportiva', 'moda-fitness', 'roupa fitness|roupa de academia'], ['Brechós', 'brechos', 'brecho|roupa usada'], ['Costureira(o)', 'costureira', 'costura|costureira|ajuste de roupa']]]
-  ]
-};
+  function ofertasDe(secao) {
+    var lista = [], nos = secao.querySelectorAll('a.ind-of, .widget.Image'), i, n, o;
+    for (i = 0; i < nos.length; i++) {
+      n = nos[i];
+      if (n.tagName === 'A') lista.push(n);
+      else { o = deImagem(n); if (o) lista.push(o); }
+    }
+    return lista;
+  }
+
+  function prepararOferta(a) {
+    var img = a.querySelector('img'), topo = img, info = el('div', 'ind-info'), acao = el('div', 'ind-acao'), precos = el('div', 'ind-precos'), foto = el('div', 'ind-foto'), nos, i;
+    while (topo && topo.parentNode !== a) topo = topo.parentNode;
+    if (img) { img.setAttribute('loading', 'lazy'); img.setAttribute('decoding', 'async'); if (!img.hasAttribute('alt')) img.setAttribute('alt', ''); }
+    nos = [].slice.call(a.childNodes);
+    for (i = 0; i < nos.length; i++) {
+      if (nos[i] === topo) continue;
+      if (tem(nos[i], 'ind-de') || tem(nos[i], 'ind-por')) precos.appendChild(nos[i]); else info.appendChild(nos[i]);
+    }
+    if (precos.childNodes.length) acao.appendChild(precos);
+    acao.appendChild(el('span', 'ind-cta', a.getAttribute('data-cta') || 'Ver oferta'));
+    if (topo) foto.appendChild(topo);
+    a.appendChild(foto); a.appendChild(info); a.appendChild(acao);
+  }
+
+  function montar(secao, seletorAlvo) {
+    if (!secao || secao.getAttribute('data-ind')) return;
+    var ofertas = ofertasDe(secao);
+    if (!ofertas.length) return;
+    secao.setAttribute('data-ind', '1');
+
+    var raiz = el('div', 'ind'), card = el('div', 'ind-card'), slides = el('div', 'ind-slides'), dots = el('div', 'ind-dots');
+    raiz.setAttribute('role', 'region'); raiz.setAttribute('aria-roledescription', 'carrossel'); raiz.setAttribute('aria-label', 'Economizei indica');
+
+    var botoes = [], atual = 0, pausado = false;
+    ofertas.forEach(function (a, i) {
+      prepararOferta(a);
+      slides.appendChild(a);
+      var b = el('button', 'ind-dot'); b.type = 'button'; b.setAttribute('aria-label', 'Ir para a oferta ' + (i + 1));
+      b.addEventListener('click', function () { ir(i); });
+      botoes.push(b); dots.appendChild(b);
+    });
+
+    function ir(n) {
+      atual = (n + ofertas.length) % ofertas.length;
+      ofertas.forEach(function (a, i) {
+        var on = i === atual;
+        a.classList.toggle('ativo', on); a.setAttribute('aria-hidden', on ? 'false' : 'true'); a.tabIndex = on ? 0 : -1;
+        botoes[i].classList.toggle('ativo', on); botoes[i].setAttribute('aria-current', on ? 'true' : 'false');
+      });
+    }
+
+    card.appendChild(slides);
+    if (ofertas.length > 1) card.appendChild(dots);
+    raiz.appendChild(el('div', 'ind-rotulo', 'Economizei indica'));
+    raiz.appendChild(card);
+    raiz.appendChild(el('p', 'ind-aviso', AVISO));
+    secao.appendChild(raiz);
+    secao.classList.add('ind-js');
+    ir(0);
+
+    if (ofertas.length > 1) {
+      var x0 = null;
+      card.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; pausado = true; }, { passive: true });
+      card.addEventListener('touchend', function (e) {
+        if (x0 !== null) { var dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) ir(atual + (dx < 0 ? 1 : -1)); }
+        x0 = null; pausado = false;
+      }, { passive: true });
+      card.addEventListener('mouseenter', function () { pausado = true; });
+      card.addEventListener('mouseleave', function () { pausado = false; });
+      card.addEventListener('focusin', function () { pausado = true; });
+      card.addEventListener('focusout', function () { pausado = false; });
+      if (!reduzir) setInterval(function () { if (!pausado && !document.hidden) ir(atual + 1); }, INTERVALO);
+    }
+    if (seletorAlvo) posicionar(secao, seletorAlvo);
+  }
+
+  function iniciar() {
+    var cl = document.body.classList;
+    if (cl.contains('home')) montar(document.getElementById('indica-home'), '.main-section-title');
+    if (cl.contains('static_page')) montar(document.getElementById('indica-pagina'), '.ev-sb');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
+})();
