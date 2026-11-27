@@ -77,8 +77,9 @@
   }
 
   function iniciar() {
-    montar(document.getElementById('indica-home'), '.main-section-title');
-    montar(document.getElementById('indica-pagina'), '.ev-sb');
+    var cl = document.body.classList;
+    if (cl.contains('home')) montar(document.getElementById('indica-home'), '.main-section-title');
+    if (cl.contains('static_page')) montar(document.getElementById('indica-pagina'), '.ev-sb');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 })();
