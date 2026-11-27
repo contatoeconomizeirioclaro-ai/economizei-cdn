@@ -1,7 +1,7 @@
 window.RICO_CONFIG = {
   ligado: true, base: '',
-  imgBolha: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiRq1DoSRdDQC2MoTXYmGiRlPg2Yr8_Pf9kZLGJl1lxdvJvWiBhcvUfAK_4ThYDcel1F05lhdIoREbc5M4ZwEMFRDCfhcFYsd0JccsPIBerjZyQXkiA8z8O9J9UrQowEqMrqBALkkzXmyfZLUxyXJ4f8yojiVD5-GhReRRo-0pfxECWSoIUSc8N9LR_zw/s320/Papagaio%20Mascote%20de%20Chap%C3%A9u%20de%20Palha.webp',
-  imgPainel: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiRq1DoSRdDQC2MoTXYmGiRlPg2Yr8_Pf9kZLGJl1lxdvJvWiBhcvUfAK_4ThYDcel1F05lhdIoREbc5M4ZwEMFRDCfhcFYsd0JccsPIBerjZyQXkiA8z8O9J9UrQowEqMrqBALkkzXmyfZLUxyXJ4f8yojiVD5-GhReRRo-0pfxECWSoIUSc8N9LR_zw/s1254/Papagaio%20Mascote%20de%20Chap%C3%A9u%20de%20Palha.webp',
+    imgBolha: 'https://cdn.jsdelivr.net/gh/contatoeconomizeirioclaro-ai/economizei-cdn@main/rico/rico-icone.png',
+  imgPainel: 'https://cdn.jsdelivr.net/gh/contatoeconomizeirioclaro-ai/economizei-cdn@main/rico/rico-chat.png',
   whatsapp: '5524998808647', email: 'contato@economizeirioclaro.com.br', paginaCategorias: '/p/categorias.html', paginaCadastro: '/p/cadastro.html', paginaOnibus: '/p/horario-de-onibus.html',
   atalhos: [['Categorias','/p/categorias.html']],
   dicas: {
