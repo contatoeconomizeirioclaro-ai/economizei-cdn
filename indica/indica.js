@@ -113,7 +113,7 @@
   function iniciar() {
     var cl = document.body.classList;
     if (cl.contains('home')) montar(document.getElementById('indica-home'), '.main-section-title');
-    if (cl.contains('static_page')) montar(document.getElementById('indica-pagina'), '.ev-sb');
+    if (cl.contains('item')) montar(document.getElementById('indica-pagina'), '#post-body');   // páginas fixas e artigos: no topo, antes do conteúdo
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 })();
